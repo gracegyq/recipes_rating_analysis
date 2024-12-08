@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Recipes Rating Analysis | recipes_rating_analysis</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Recipes Rating Analysis" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="recipes_rating_analysis" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Recipes Rating Analysis" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","headline":"Recipes Rating Analysis","name":"recipes_rating_analysis","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/assets/css/style.css?v=05d0465a45ae8809176f9b8dcf1ad61d7dfbdc7f">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Recipes Rating Analysis</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/gracegyq/recipes_rating_analysis" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h1 id="recipes-rating-analysis">Recipes Rating Analysis</h1>
+
+<p><strong>Name(s)</strong>: Grace Gao &amp; Faith Jones</p>
+
+<p><strong>Website Link</strong>: https://gracegyq.github.io/recipes_rating_analysis/</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This data analysis centers around recipies and ratings found on food.com posted since 2008. There were two relevant datasets for this problem which was the recipes dataset with 83782 rows and 12 columns and the interactions dataset with 73197 rows and 5 columns which represents the rating and reviews for recipes. Together, the datasets include many columns about the recipe like name, ingredients, cooking time, ratings and more.</p>
+
+<p>To examine this data set we came up with an overarching question: <strong>How does different recipe types and factors affect the rating?</strong></p>
+
+<p>To investigate this question, we first cleaned the data and conducted exploratory data analysis to try and identify potential trends or important factors to our question. Next, we built a baseline model to start trying to predict recipe’s ratings. After this, we had many iterations and variations of the model as we attempted to improve our prediction accuracy until we finally landed on a final model for predicting recipe rating.</p>
+
+<p>The original data sets contained 16 columns, however as part of our cleaning we both created new relevant columns and selected the pertinent columns for the sake of our analysis. The table below is a list of the pertinent columns along with a description of each:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Column</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>'calories'</td>
+      <td>This column was extracted from the 'nutrition' column from the recipes dataset. It describes the number of calories in the recipe</td>
+    </tr>
+    <tr>
+      <td>'num_tags'</td>
+      <td>This column was created from the 'tags' column in the recipes dataset. It described the number of tags per recipe</td>
+    </tr>
+    <tr>
+      <td>'minutes'</td>
+      <td>This column is from the recipes dataset and describes the prep/cooking time per recipe</td>
+    </tr>
+    <tr>
+      <td>'n_steps'</td>
+      <td>This column is from the recipes dataset and describes the number of steps it takes to make the recipe</td>
+    </tr>
+    <tr>
+      <td>'num_ingredients'</td>
+      <td>This column was created from the 'ingredients' column in the recipes dataset. It describes the number of ingredients in the recipe</td>
+    </tr>
+    <tr>
+      <td>'rating'</td>
+      <td>This column is from the interactions dataset and describes the rating or stars that a reviewer gave a specific recipe</td>
+    </tr>
+    <tr>
+      <td>'rating_category'</td>
+      <td>This column was created from taking the average rating per recipe and then rounding it to the nearest integer. It describes the 'average' rating for the recipe in distinct categories which makes it easier to use classes for our model</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="data-cleaning-and-exploratory-data-analysis">Data Cleaning and Exploratory Data Analysis</h2>
+
+<p>Before we started any analysis we first needed to clean the data.</p>
+
+<h3 id="data-cleaning">Data Cleaning</h3>
+
+<p>To begin cleaning the data, we first performed a left merge on the recipe ID for the recipes and interactions dataset with the recipes being on the left. Merging the data allows us to then be able to use the factors in the recipe dataframe to prdict the ratings from the interactions dataframe.</p>
+
+<p>Once merged, we dealed with any missingness in our data. First we checked for missingness in the data. We found that the only columns in the dataframe that had missing values were only the ‘name’ and ‘description’ columns in the dataset. For the name column, we decided to leave it as NaN because we are inferring that it is a recipe with all special characters for the name, so, even though the recipe does not have a name it can still be helpful in our attempts to predict ratings based on the other columns. Further, we decided to do nothing for the description because as stated above, we didn’t include the description column in our pertinent dataframes. Additionally, when analyzing the data we noticed some of the raings had a 0, which is not possible on food.com. For all the 0 values, we decided to fill these values with NaN because the cause of these 0 star ratings is that someone left a review/comment on the recipe, and did not provide a rating. Therefore, having these recipes with a rating of NaN makes more sense since they did not have a rating as opposed to getting a rating of 0.</p>
+
+<p>Next, we added a new column to find the average rating per recipe since as the dataset was the same recipe could have multiple ratings. We did this by grouping the recipe ids and finding the mean of the ratings. Then we converted this series to a dataframe and merged it with the current dataframe we were working with. This affected our analysis because it allowed us to be able to predict the recipes overall rating instead of focusing on individual reviews and recipes since we want a more holistic prediction for the recipes. To further build on the ratings, we then added a column for the rating_category which rounds the average rating to an integer value in order to use these distinct categories as classes for our models. We decided to drop the rating_categories that were NaN because without knowing which category it’s in, we can’t test the accuracy of the prediction for that column.</p>
+
+<p>Then we considered the data types of the columns for our cleaning, specifically we changed the ‘nutrition’ column originally from the recipes dataset. We first converted the data for this column into a list. After then we extracted all of the information from nutrition out into its relevant columns which are ‘calories’, ‘total fat (PDV)’, ‘sugar (PDV)’, ‘sodium (PDV)’, ‘protein (PDV)’, ‘saturated fat (PDV)’, and ‘carbohydrates (PDV)’. This is helpful because it allows us to use these factors, like calories, to build our model and help predict the ratings.</p>
+
+<p>Lastly, we considered outliers in our data that are significantly changing our mean and standard deviation. We first dropped recipes that only have one review because intuitively we thought that recipes with only one review might be too biased. Some outliers we decided to drop from our dataset for the sake of the analysis were any recipes that contained the word “homemade” in the name. This makes sense to do because making something homemade, generally, takes a lot of time because often it accounts the time for the food to do something like ferment. We found that without the homemade recipes the standard deviation decreased by over 6%, which we found to be quite significant since we were only removing 280 samples from the dataset. Additonally, we dropped recipe 447963 - “how to preserve a husband” because this it is not a serious recipe, which means it would not be a good predictor of the rating which we are interested in. Below is the head of the cleaned data set:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">name</th>
+      <th style="text-align: right">id</th>
+      <th style="text-align: right">minutes</th>
+      <th style="text-align: right">contributor_id</th>
+      <th style="text-align: left">submitted</th>
+      <th style="text-align: left">tags</th>
+      <th style="text-align: right">n_steps</th>
+      <th style="text-align: left">steps</th>
+      <th style="text-align: left">description</th>
+      <th style="text-align: left">ingredients</th>
+      <th style="text-align: right">n_ingredients</th>
+      <th style="text-align: right">rating</th>
+      <th style="text-align: right">recipe_id</th>
+      <th style="text-align: right">num_ratings</th>
+      <th style="text-align: right">calories</th>
+      <th style="text-align: right">total fat (PDV)</th>
+      <th style="text-align: right">sugar (PDV)</th>
+      <th style="text-align: right">sodium (PDV)</th>
+      <th style="text-align: right">protien (PDV)</th>
+      <th style="text-align: right">saturated fat (PDV)</th>
+      <th style="text-align: right">carbohydrates (PDV)</th>
+      <th style="text-align: right">num_tags</th>
+      <th style="text-align: right">rating_category</th>
+      <th style="text-align: right">num_ingredients</th>
+      <th style="text-align: left">rating_bins</th>
+      <th style="text-align: left">calories_quartile</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">412 broccoli casserole</td>
+      <td style="text-align: right">306168</td>
+      <td style="text-align: right">40</td>
+      <td style="text-align: right">50969</td>
+      <td style="text-align: left">2008-05-30</td>
+      <td style="text-align: left">[‘60-minutes-or-less’, ‘time-to-make’, ‘course’, ‘main-ingredient’, ‘preparation’, ‘side-dishes’, ‘vegetables’, ‘easy’, ‘beginner-cook’, ‘broccoli’]</td>
+      <td style="text-align: right">6</td>
+      <td style="text-align: left">[‘preheat oven to 350 degrees’, ‘spray a 2 quart baking dish with cooking spray , set aside’, ‘in a large bowl mix together broccoli , soup , one cup of cheese , garlic powder , pepper , salt , milk , 1 cup of french onions , and soy sauce’, ‘pour into baking dish , sprinkle remaining cheese over top’, ‘bake for 25 minutes or until cheese is lightly browned’, ‘sprinkle with rest of french fried onions and bake until onions are browned and cheese is bubbly , about 10 more minutes’]</td>
+      <td style="text-align: left">since there are already 411 recipes for broccoli casserole posted to “zaar” ,i decided to call this one  #412 broccoli casserole.i don’t think there are any like this one in the database. i based this one on the famous “green bean casserole” from campbell’s soup. but i think mine is better since i don’t like cream of mushroom soup.submitted to “zaar” on may 28th,2008</td>
+      <td style="text-align: left">[‘frozen broccoli cuts’, ‘cream of chicken soup’, ‘sharp cheddar cheese’, ‘garlic powder’, ‘ground black pepper’, ‘salt’, ‘milk’, ‘soy sauce’, ‘french-fried onions’]</td>
+      <td style="text-align: right">9</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">306168</td>
+      <td style="text-align: right">4</td>
+      <td style="text-align: right">194.8</td>
+      <td style="text-align: right">20</td>
+      <td style="text-align: right">6</td>
+      <td style="text-align: right">32</td>
+      <td style="text-align: right">22</td>
+      <td style="text-align: right">36</td>
+      <td style="text-align: right">3</td>
+      <td style="text-align: right">10</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">165</td>
+      <td style="text-align: left">nan</td>
+      <td style="text-align: left">Q2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">2000 meatloaf</td>
+      <td style="text-align: right">475785</td>
+      <td style="text-align: right">90</td>
+      <td style="text-align: right">2202916</td>
+      <td style="text-align: left">2012-03-06</td>
+      <td style="text-align: left">[‘time-to-make’, ‘course’, ‘main-ingredient’, ‘preparation’, ‘main-dish’, ‘potatoes’, ‘vegetables’, ‘4-hours-or-less’, ‘meatloaf’, ‘simply-potatoes2’]</td>
+      <td style="text-align: right">17</td>
+      <td style="text-align: left">[‘pan fry bacon , and set aside on a paper towel to absorb excess grease’, ‘mince yellow onion , red bell pepper , and add to your mixing bowl’, ‘chop garlic and set aside’, ‘put 1tbsp olive oil into a saut pan , along with chopped garlic , teaspoons white pepper and a pinch of kosher salt’, ‘bring to a medium heat to sweat your garlic’, ‘preheat oven to 350f’, ‘coarsely chop your baby spinach add to your heated pan , stir frequently for approximately 5 min to wilt’, ‘add your spinach to the mixing bowl’, ‘chop your now cooled bacon , and add it to the mixing bowl’, ‘add your meatloaf mix to the bowl , with one egg and mix till thoroughly combined’, ‘add your goat cheese , one egg , 1 / 8 tsp white pepper and 1 / 8 tsp of kosher salt and mix till thoroughly combined’, ‘transfer to a 9x5 meatloaf pan , and cook for 60 min or until the internal temperature is at least 160f’, ‘let stand for 5min’, ‘melt 1tbsp unsalted butter into a frying pan , and cook up to three eggs at a time’, ‘crack each egg into a separate dish , in order to prevent egg shells from reaching the pan , then add salt and pepper to taste’, ‘wait until the egg whites are firm looking , but slightly runny on top before flipping your eggs’, ‘after flipping , wait 10~20 seconds before removing each egg and placing it over your slices of meatloaf’]</td>
+      <td style="text-align: left">ready, set, cook! special edition contest entry: a mediterranean flavor inspired meatloaf dish. featuring: simply potatoes - shredded hash browns, egg, bacon, spinach, red bell pepper, and goat cheese.</td>
+      <td style="text-align: left">[‘meatloaf mixture’, ‘unsmoked bacon’, ‘goat cheese’, ‘unsalted butter’, ‘eggs’, ‘baby spinach’, ‘yellow onion’, ‘red bell pepper’, ‘simply potatoes shredded hash browns’, ‘fresh garlic’, ‘kosher salt’, ‘white pepper’, ‘olive oil’]</td>
+      <td style="text-align: right">13</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">475785</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">267</td>
+      <td style="text-align: right">30</td>
+      <td style="text-align: right">12</td>
+      <td style="text-align: right">12</td>
+      <td style="text-align: right">29</td>
+      <td style="text-align: right">48</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">10</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">231</td>
+      <td style="text-align: left">nan</td>
+      <td style="text-align: left">Q2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">50 chili   for the crockpot</td>
+      <td style="text-align: right">501028</td>
+      <td style="text-align: right">345</td>
+      <td style="text-align: right">2628680</td>
+      <td style="text-align: left">2013-05-28</td>
+      <td style="text-align: left">[‘course’, ‘main-ingredient’, ‘cuisine’, ‘preparation’, ‘occasion’, ‘main-dish’, ‘soups-stews’, ‘beans’, ‘beef’, ‘pork’, ‘mexican’, ‘easy’, ‘stews’, ‘crock-pot-slow-cooker’, ‘spicy’, ‘lentils’, ‘meat’, ‘taste-mood’, ‘equipment’, ‘presentation’, ‘served-hot’, ‘3-steps-or-less’]</td>
+      <td style="text-align: right">4</td>
+      <td style="text-align: left">[‘combine all ingredients in a 7-quart crockpot’, ‘it might be easier to combine in a larger vessel , mix , and then transfer to your crockpot’, ‘cook on “high” for 5 hours , or “low” for 8 hours’, ‘i typically serve the chili over a bed of whole tostito chips , with a layer of shredded cheese in between’]</td>
+      <td style="text-align: left">first, thank you to <em>parsley</em> - chef # 199848 - for inspiring me with her “thick and chunky crock pot game day chili,” recipe #251837.  i had tried about 20 different recipes for chili, and <em>parsley</em>’s was the best.  but i’ve been tweaking it for a year and a half now, and i think i did it!  this chili is medium to medium-hot, not very sweet, hearty and stew-like, with depth and a delicious aftertaste.  i make in a 7-quart crockpot, for my large family.  if you like your chili sweeter, use a red onion instead of a white onion; add more brown sugar; and/or add more chocolate chips.  be careful:  a little chocolate - just like cumin and cinnamon - goes a looonnnngggg way!</td>
+      <td style="text-align: left">[‘stewing beef’, ‘stewing pork’, ‘white onion’, ‘bell peppers’, ‘habanero pepper’, ‘garlic’, ‘beans’, ‘chunky salsa’, ‘tomato paste’, ‘beef broth’, ‘tortilla chips’, ‘chicken bouillon cube’, ‘beef bouillon cube’, ‘sazon goya’, ‘cinnamon’, ‘mexican chili powder’, ‘cumin’, ‘ground coriander’, ‘black pepper’, ‘salt’, ‘light brown sugar’, ‘dark chocolate chips’]</td>
+      <td style="text-align: right">22</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">501028</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">270.2</td>
+      <td style="text-align: right">19</td>
+      <td style="text-align: right">26</td>
+      <td style="text-align: right">48</td>
+      <td style="text-align: right">52</td>
+      <td style="text-align: right">21</td>
+      <td style="text-align: right">4</td>
+      <td style="text-align: right">22</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">360</td>
+      <td style="text-align: left">nan</td>
+      <td style="text-align: left">Q2</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">blepandekager   danish   apple pancakes</td>
+      <td style="text-align: right">503475</td>
+      <td style="text-align: right">50</td>
+      <td style="text-align: right">128473</td>
+      <td style="text-align: left">2013-07-08</td>
+      <td style="text-align: left">[‘danish’, ‘60-minutes-or-less’, ‘time-to-make’, ‘course’, ‘cuisine’, ‘preparation’, ‘pancakes-and-waffles’, ‘breakfast’, ‘scandinavian’, ‘european’]</td>
+      <td style="text-align: right">10</td>
+      <td style="text-align: left">[‘beat the eggs lightly and add the milk’, ‘combine the flour , sugar and salt’, ‘stir the flour mixture into the egg mixture , stirring in the cup of cream as you mix’, ‘fry the apple slices in butter in a skillet’, ‘preheat oven to 500 degree’, ‘cover the bottom of an oven-proof baking dish , or heavy skillet , with apples’, ‘pour the batter over slices and bake in a preheated 500 oven’, ‘when nearly done , remove from oven and sprinkle here and there with a mixture of sugar and cinnamon to taste’, ‘place dabs of butter on the pancake and return to oven until browned’, ‘just before serving , sprinkle with lemon juice , and cut into triangles’]</td>
+      <td style="text-align: left">this recipe has been posted here for play in zwt9 - scandinavia.  this recipe was found at website: mindspring.com - christian’s danish recipes.</td>
+      <td style="text-align: left">[‘eggs’, ‘milk’, ‘flour’, ‘sugar’, ‘salt’, ‘cream’, ‘apples’, ‘butter’, ‘cinnamon’, ‘lemon, juice of’]</td>
+      <td style="text-align: right">10</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">503475</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">358.2</td>
+      <td style="text-align: right">30</td>
+      <td style="text-align: right">62</td>
+      <td style="text-align: right">14</td>
+      <td style="text-align: right">19</td>
+      <td style="text-align: right">54</td>
+      <td style="text-align: right">12</td>
+      <td style="text-align: right">10</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">102</td>
+      <td style="text-align: left">nan</td>
+      <td style="text-align: left">Q3</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">bbq spray recipe    it really works</td>
+      <td style="text-align: right">327356</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">398160</td>
+      <td style="text-align: left">2008-09-26</td>
+      <td style="text-align: left">[‘15-minutes-or-less’, ‘time-to-make’, ‘course’, ‘preparation’, ‘low-protein’, ‘healthy’, ‘5-ingredients-or-less’, ‘very-low-carbs’, ‘condiments-etc’, ‘easy’, ‘low-fat’, ‘dietary’, ‘low-sodium’, ‘low-cholesterol’, ‘low-saturated-fat’, ‘low-calorie’, ‘low-carb’, ‘low-in-something’]</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: left">[‘mix ingredients together and add to a clean spray bottle’, ‘spray and “wet” your bbq meat’, ‘seal the meat in a plastic bag and refrigerate at least 4 hours or overnight’, ‘grill the meat over indirect heat according to your recipe , spraying every 15minutes during the cooking time’, ‘remove meat from grill and serve’]</td>
+      <td style="text-align: left">using this marinade/spray will insure that your grilled meats are tender and tasty every time. try it on beef or pork ribs, beef brisket, pork butt or chicken. you’ll love the results!</td>
+      <td style="text-align: left">[‘red wine vinegar’, ‘lemon juice’, ‘water’]</td>
+      <td style="text-align: right">3</td>
+      <td style="text-align: right">4.75</td>
+      <td style="text-align: right">327356</td>
+      <td style="text-align: right">4</td>
+      <td style="text-align: right">47.2</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">2</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">18</td>
+      <td style="text-align: right">5</td>
+      <td style="text-align: right">44</td>
+      <td style="text-align: left">[4, 5)</td>
+      <td style="text-align: left">Q1</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="exploratory-data-analysis">Exploratory Data Analysis</h3>
+
+<h4 id="univariate-analysis">Univariate Analysis</h4>
+
+<p>To start understanding our data set, we made many different graphs to visualize trends in our data. One of the most prevalent distributions to our analysis is the distribution of the recipe ratings which you can find below:</p>
+
+<iframe src="assets/ratings_distribution.html" width="800" height="600" frameborder="0"></iframe>
+
+<p>From the plot we can see that most of the ratings are either 4 or 5. For our analysis this might mean that the dataset is biased towards the higher ratings, especially 5, because a significant portion of the dataset is the higher ratings.</p>
+
+<h4 id="bivariate-analysis">Bivariate Analysis</h4>
+<p>Below is one of the bivariate analysis plots we created:</p>
+<iframe src="assets/calories_ratings_boxplot.html" width="800" height="600" frameborder="0"></iframe>
+
+<p>While the plot does not seem to show highly significant difference among the different rating categories, looking at the specific metrics of each rating, it seems that rating 3 is associated with a slightly higher median for calories, and it goes down as the rating increases to a 4 and a 5, which is meaningful in helping us answer the initial question because it shows that <code class="language-plaintext highlighter-rouge">calories</code> might be a potential feature that we can use to predict our model, although we are anticipating some challenges when using <code class="language-plaintext highlighter-rouge">calories</code> because of the lack of separation among the different ratings. Additionally, we can also see that the 5-rating class seems to have significantly more outlier recipes with extremely high ratings, which might be helpful for our models too in predicting that the recipes with extremely high calories are more likely to have 5-star ratings.</p>
+
+<h4 id="interesting-aggregates">Interesting Aggregates</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>calories_quartile</th>
+      <th>Q1</th>
+      <th>Q2</th>
+      <th>Q3</th>
+      <th>Q4</th>
+    </tr>
+    <tr>
+      <th>rating_category</th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1.0</td>
+      <td>159</td>
+      <td>166</td>
+      <td>117</td>
+      <td>144</td>
+    </tr>
+    <tr>
+      <td>2.0</td>
+      <td>182</td>
+      <td>198</td>
+      <td>208</td>
+      <td>180</td>
+    </tr>
+    <tr>
+      <td>3.0</td>
+      <td>646</td>
+      <td>690</td>
+      <td>713</td>
+      <td>689</td>
+    </tr>
+    <tr>
+      <td>4.0</td>
+      <td>4995</td>
+      <td>5182</td>
+      <td>5352</td>
+      <td>527</td>
+    </tr>
+    <tr>
+      <td>5.0</td>
+      <td>14199</td>
+      <td>14033</td>
+      <td>13803</td>
+      <td>13765</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This pivot table provides more insight regarding the relationship between <code class="language-plaintext highlighter-rouge">calories</code> and <code class="language-plaintext highlighter-rouge">rating</code> in that the highest rating class, namely the 5.0 ratings, seems to have higher entries in the lower calories quartile, which might suggest the idea that there are many recipes with lower calories that have high ratings. Additionally, looking at each column, it seems that for each calories quartile, there significantly higher 5.0 ratings than every other rating category, suggesting that in our prediction model, we might encounter some class inbalance issues and should try to work it out.</p>
+
+<h4 id="imputation">Imputation</h4>
+
+<p>We did not end up imputing any values into the dataset, but instead removed the columns that were misisng key values that we needed because the majority of the missing values existed either in columns that were not used in our specific anlaysis or in the column that we are trying to predict.</p>
+
+<h2 id="framing-a-prediction-problem">Framing a Prediction Problem</h2>
+<p><strong>Prediction Problem:</strong>
+We are attempting to use the columns with information regarding calories, number of steps it takes, number of ingredients, and cooking time to predict the rating of the recipe, and weo performed multiclass classification for our prediction models.</p>
+
+<p><strong>Evaluation Metric:</strong> 
+We used a combination of overall accuracy as well as the precision level per class. The overall accuuracy evaluated how well the model did in terms of predicting the correct class given information from the four columns described above. Additionally, we looked at the confusiono matrix, particularlyy the precision level for each class, as an additional metric because that would provide insight on whether the accuracy is from actually predicting all the classes correctly or just from predicting all the data points to be of the class with the highest frequency, which would still result in a decent overall accuracy if that class has significantly more data points than the rest.</p>
+
+<h2 id="baseline-model">Baseline Model</h2>
+<p>For our baseline model, we chose to use a <code class="language-plaintext highlighter-rouge">RandomForestClassifier</code> as our training model, which uses a collection of decision trees to make the classification prediction. The features we used to train this model are <code class="language-plaintext highlighter-rouge">calories</code>, which represents the number of calories for each recipe, and <code class="language-plaintext highlighter-rouge">minutes</code>, which is the number of steps it takes to finish the recipe, boht of which we thought have the potential to make reasonable predictions for the rating of a recipe. Both of the features are quantitative data columns. We considered using the categorical columns, such as ingredients and tags; however, after thorough exploration, we decided that performing one-hot-encoding or other transformation functions on the categorical variables would not be very effective given the fact that there are too many options for ingredients or tags. We did not perform <code class="language-plaintext highlighter-rouge">StandardScaler()</code> on the two features chosen because <code class="language-plaintext highlighter-rouge">RandomForestClassifier</code> is not very sensitive to the scale of data since it is a threshold-based approach.</p>
+
+<p>We believe that our model is decent, but it revealed a signficant problem in out datasets that makes classification much more challenging, which is the problem of class imbalance. Our model’s accuracy is approximately 0.56362 on used on the unseen testing set, which is not a bad prediction accuracy; however, when looking at the precision parameter for each of the rating classes in the classification report, the precision of ratings of 1, 2, and 3 are all 0.0 or near 0 while the precision for ratings of 4 and especially 5 are signficantly higher. Looking more specifically at the distribution of predictions, it seems that the model mostly predicts that all the data points have a 5-rating. The decently high accuracy of the model is simply from the fact that the entire dataset, and by extension the test set as well, have a significantly higher proportion of 5-ratings than all other ratings. This suggests that our current model is not the best predictor model because it is taking advantage of the class imbalance and not faily predicting results for all five of the distinct classes.</p>
+
+<h2 id="final-model">Final Model</h2>
+<p>After going through some iterations of the model we landed on a final model of a random forest classifier with some added features for an improved accuracy of 0.64. To improve our model, we oversampled the underrepresented classes by duplicating the data as well as cross validating some of the hyperparameters in the model.</p>
+
+<p>To oversample the underrepresented classes, we duplicated the under represented classes, 1, 2, 3, and 4 to be around the same size as the number of samples in class 5, which has a major bias in the data. This helped improve our model by encouraging it to predict a rating other than 5 because when running previous versions of our model we noticed that the models would mostly predict 5s. We tried other methods, such as class weight adjustment and SMOTE and paired them with logistical regression models; however, those did not seem to significantly improve the accuracy and precision of our model.</p>
+
+<p>Additionally, we added cross validation to our model for the n_estimators and max_depth hyperparameters in the random forest classifier. To do this we picked a variety of values for the hyperparameters and ran a GridSearchCV to then find which combination of these hyperparameters produces the best accuracy.</p>
+
+<p>After many iterations and models, our final model improved from the baseline by 0.08 which validates that our final model improved frm our baseline model.</p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/gracegyq/recipes_rating_analysis">recipes_rating_analysis</a> is maintained by <a href="https://github.com/gracegyq">gracegyq</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
